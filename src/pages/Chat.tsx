@@ -23,8 +23,16 @@ export default function Chat() {
 
   useEffect(() => {
     fetch("/api/documents")
-      .then(res => res.json())
-      .then(data => setDocumentUris(data.documents || []))
+      .then(async res => {
+         if (!res.ok) return;
+         const text = await res.text();
+         try {
+           const data = JSON.parse(text);
+           setDocumentUris(data.documents || []);
+         } catch (e) {
+           console.error("Invalid JSON:", text);
+         }
+      })
       .catch(console.error);
   }, []);
 

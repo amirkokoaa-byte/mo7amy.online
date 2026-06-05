@@ -102,7 +102,7 @@ async function startServer() {
       }
 
       const response = await getAi().models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: contents,
         config: {
           systemInstruction: "أنت المساعد القانوني 'دليلي القانوني'. مهمتك مساعدة المواطنين والمحامين بمعلومات واستشارات قانونية بناءً على القوانين المصرية المرفوعة. اعتمد على الملفات كمرجع أساسي، وقم بتلخيص الإجابة وتقديم مراجع للمواد القانونية. قدم إجابتك باللغة العربية بأسلوب احترافي وواضح.",

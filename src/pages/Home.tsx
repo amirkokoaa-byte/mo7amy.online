@@ -16,8 +16,13 @@ export default function Home() {
     try {
       const res = await fetch("/api/documents");
       if (res.ok) {
-        const data = await res.json();
-        setUploadedDocs(data.documents || []);
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          setUploadedDocs(data.documents || []);
+        } catch (e) {
+          console.error("Invalid JSON:", text);
+        }
       }
     } catch (e) {
       console.error(e);

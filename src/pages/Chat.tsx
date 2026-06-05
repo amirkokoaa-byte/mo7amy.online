@@ -131,7 +131,7 @@ export default function Chat() {
       setMessages(prev => [...prev, { role: "model", text: data.text, id: Date.now() }]);
     } catch (e: any) {
       console.error(e);
-      setMessages(prev => [...prev, { role: "model", text: "عذراً، حدث خطأ أثناء الاتصال بالخادم.", id: Date.now() }]);
+      setMessages(prev => [...prev, { role: "model", text: `عذراً، حدث خطأ أثناء الاتصال بالخادم: ${e.message}`, id: Date.now() }]);
     } finally {
       setLoading(false);
     }

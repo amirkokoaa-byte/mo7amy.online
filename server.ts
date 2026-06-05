@@ -25,7 +25,18 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: "50mb" }));
+
+  let globalDocuments: any[] = [];
+
+  app.get("/api/documents", (req, res) => {
+    res.json({ documents: globalDocuments });
+  });
+
+  app.delete("/api/documents", (req, res) => {
+    globalDocuments = [];
+    res.json({ success: true });
+  });
 
   app.post("/api/upload", upload.array("files"), async (req, res) => {
     try {
@@ -39,18 +50,21 @@ async function startServer() {
         // We upload each file using File API
         const uploadedFile = await getAi().files.upload({
           file: file.path,
-          config: { mimeType: file.mimetype }
+          config: { mimeType: file.mimetype || "application/pdf", displayName: file.originalname }
         });
 
         uploadedUris.push({
           uri: uploadedFile.uri,
           name: file.originalname,
-          mimeType: uploadedFile.mimeType,
+          mimeType: uploadedFile.mimeType || file.mimetype || "application/pdf",
+          id: Date.now().toString() + Math.random().toString()
         });
 
         // Clean up tmp file
         await fs.unlink(file.path).catch(console.error);
       }
+
+      globalDocuments = [...globalDocuments, ...uploadedUris];
 
       res.json({ files: uploadedUris });
     } catch (e: any) {

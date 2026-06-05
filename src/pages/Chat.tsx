@@ -10,6 +10,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [playingAudioId, setPlayingAudioId] = useState<number | null>(null);
+  const [documentUris, setDocumentUris] = useState<any[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -19,6 +20,13 @@ export default function Chat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  useEffect(() => {
+    fetch("/api/documents")
+      .then(res => res.json())
+      .then(data => setDocumentUris(data.documents || []))
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     // Setup Speech Recognition
@@ -92,9 +100,6 @@ export default function Chat() {
     setLoading(true);
 
     try {
-      const savedDocs = localStorage.getItem("legal_documents");
-      const documentUris = savedDocs ? JSON.parse(savedDocs) : [];
-
       // Send to server
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -105,8 +110,15 @@ export default function Chat() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const textRes = await res.text();
+      let data;
+      try {
+        data = JSON.parse(textRes);
+      } catch (err) {
+        throw new Error(`Server Error: ${res.status}`);
+      }
+
+      if (!res.ok) throw new Error(data?.error || "Error from server");
 
       setMessages(prev => [...prev, { role: "model", text: data.text, id: Date.now() }]);
     } catch (e: any) {
@@ -141,9 +153,15 @@ export default function Chat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
-      const data = await res.json();
+      const textRes = await res.text();
+      let data;
+      try {
+        data = JSON.parse(textRes);
+      } catch (err) {
+        throw new Error(`Server Error: ${res.status}`);
+      }
 
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data?.error || "Error from server");
 
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();

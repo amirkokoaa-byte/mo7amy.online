@@ -1,0 +1,16 @@
+{
+  "name": "دليلي القانوني",
+  "short_name": "دليلي",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "description": "مساعد قانوني بالذكاء الاصطناعي",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
